@@ -165,7 +165,6 @@ def draw_maze():
 
     while running:
         screen.fill(BG_COLOR)
-        drawGrid(drawn_grid, start, end, path)
         mx, my = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:
             rx, ry = getRectangleClicked(drawn_grid, mx, my)
@@ -174,6 +173,8 @@ def draw_maze():
                     if start is not None:
                         drawn_grid[start[0]][start[1]] = 1
                     start = (rx, ry)
+                    if start and end:
+                        path = astar.astar(copy.deepcopy(drawn_grid), start, end)
                 elif start != (rx, ry) and end != (rx, ry):
                     drawn_grid[rx][ry] = 0
 
@@ -184,9 +185,11 @@ def draw_maze():
                     if end is not None:
                         drawn_grid[end[0]][end[1]] = 1
                     end = (rx, ry)
+                    if start and end:
+                        path = astar.astar(copy.deepcopy(drawn_grid), start, end)
                 elif end != (rx, ry) and start != (rx, ry):
                     drawn_grid[rx][ry] = 1
-
+        drawGrid(drawn_grid, start, end, path)
         draw_text('Draw Maze', font100, TEXT_COLOR, screen, WIDTH // 2, HEIGHT // 10)
         x = (clower1[0] + 50, clower1[1])
         y = (clower1[0] + 25, clower1[1] - 25)
