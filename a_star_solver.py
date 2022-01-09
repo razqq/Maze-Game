@@ -24,6 +24,9 @@ class Cell:
 
 
 def astar(maze, start, end):
+    for m in maze:
+        print(m)
+    print(start, end)
     """
     This method returns a list of tuples as the path from the start to the end of the maze
     :param maze: the maze path will be searched on
@@ -67,9 +70,10 @@ def astar(maze, start, end):
         closed_list.append(current_cell)
 
         # Set the current position as blocked for future use
-        maze[current_cell.position[0]][current_cell.position[1]] = 1
+        maze[current_cell.position[0]][current_cell.position[1]] = 0
 
         # Check if the player found the goal (reached the end cell), and returns the reversed path
+        # print(current_cell.position, current_cell.parent, end_cell.position, end_cell.parent)
         if current_cell == end_cell:
             path = []
             current = current_cell
@@ -97,7 +101,7 @@ def astar(maze, start, end):
                 continue
 
             # Check it the position is empty and is not a block
-            if maze[cell_position[0]][cell_position[1]] != 0:
+            if maze[cell_position[0]][cell_position[1]] != 1:
                 continue
 
             # Create the new cell and append it to the children list

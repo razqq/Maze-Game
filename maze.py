@@ -1,6 +1,8 @@
+import copy
 import sys
 import pygame
 from pygame.locals import *
+import a_star_solver as astar
 
 CLOCK = pygame.time.Clock()
 HEIGHT, WIDTH = 800, 1000
@@ -109,18 +111,18 @@ def drawGridLegend(grid):
     pass
 
 
-def drawGrid(grid, start, end):
+def drawGrid(grid, start, end, path):
     drawGridLegend(grid)
     blockSize = 15  # Set the size of the grid block
     cx, cy = WIDTH // 2 - len(grid) * blockSize // 2, HEIGHT // 1.65 - len(grid[0]) * blockSize // 2
     for x in range(len(grid)):
         for y in range(len(grid[0])):
             rect = pygame.Rect(cx + x * blockSize, cy + y * blockSize, blockSize, blockSize)
-            if grid[x][y] == 2:
+            if (x, y) == start:
                 pygame.draw.rect(screen, START_COLOR, rect, 0)
-            elif grid[x][y] == 3:
+            elif (x, y) == end:
                 pygame.draw.rect(screen, END_COLOR, rect, 0)
-            elif grid[x][y] == -1 and (x, y) != start and (x, y) != end:
+            elif path and (x, y) in path:
                 pygame.draw.rect(screen, PATH_COLOR, rect, 0)
             else:
                 pygame.draw.rect(screen, RECT_COLOR, rect, grid[x][y])
@@ -153,10 +155,8 @@ def dfs(grid, node, end, visited):
 
 
 
-
-
-
 def draw_maze():
+    path = []
     running = True
     size_x, size_y = 20, 20
     start, end = None, None
@@ -165,7 +165,7 @@ def draw_maze():
 
     while running:
         screen.fill(BG_COLOR)
-        drawGrid(drawn_grid, start, end)
+        drawGrid(drawn_grid, start, end, path)
         mx, my = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:
             rx, ry = getRectangleClicked(drawn_grid, mx, my)
@@ -174,7 +174,6 @@ def draw_maze():
                     if start is not None:
                         drawn_grid[start[0]][start[1]] = 1
                     start = (rx, ry)
-                    drawn_grid[rx][ry] = 2
                 elif start != (rx, ry) and end != (rx, ry):
                     drawn_grid[rx][ry] = 0
 
@@ -185,7 +184,6 @@ def draw_maze():
                     if end is not None:
                         drawn_grid[end[0]][end[1]] = 1
                     end = (rx, ry)
-                    drawn_grid[rx][ry] = 3
                 elif end != (rx, ry) and start != (rx, ry):
                     drawn_grid[rx][ry] = 1
 
@@ -227,7 +225,6 @@ def draw_maze():
                 print(x, y, z)
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
                     if lower_1.collidepoint((mx, my)):
                         if size_x > 3:
                             size_x -= 1
@@ -248,19 +245,14 @@ def draw_maze():
                                 drawn_grid[x].append(1)
                     elif button_reset_maze.collidepoint((mx, my)):
                         drawn_grid = [[1 for i in range(size_y)] for j in range(size_x)]
+                        path = []
                         for i in drawn_grid:
                             print(i)
                         start = None
                         end = None
 
                     elif button_solve_maze.collidepoint((mx, my)):
-                        path = []
-                        path = dfs(drawn_grid, start, end, [])
-                        for i, j in path[1:-1]:
-                            drawn_grid[i][j] = -1
-            else:
-                click = False
-
+                        path = astar.astar(copy.deepcopy(drawn_grid), start, end)
         pygame.display.update()
         CLOCK.tick(60)
 
