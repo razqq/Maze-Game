@@ -32,6 +32,7 @@ START_COLOR = (124, 252, 0)
 END_COLOR = (220, 20, 60)
 PATH_COLOR = (197, 231, 226)
 PATH_COLOR2 = (250, 231, 226)
+GRAY_COLOR = (220, 220, 220)
 
 
 def main_menu():
@@ -128,12 +129,12 @@ def drawGrid(grid, start, end, path):
     Given a maze, a start point, an end point and a path, it draws the corresponding blocks on the maze
     """
     order = {}
-    for idx, x in enumerate(path):
-        order[x] = idx
+    if path:
+        for idx, x in enumerate(path):
+            order[x] = idx
 
     if path:
         diff = (PATH_COLOR2[0] - PATH_COLOR[0]) / len(path)
-        tdiff = 0
 
     drawGridLegend()
     blockSize = 15  # Set the size of the grid block
@@ -171,10 +172,11 @@ def draw_maze():
     """
     # clower1 = [WIDTH // 2, HEIGHT // 8]  # Variable used to position shapes
 
-    size_x, size_y = 20, 20  # Default maze shape
+    size_x, size_y = 50, 40  # Default maze shape
     start, end = None, None  # Start and end points for maze
     drawn_grid = [[1 for _ in range(size_y)] for _ in range(size_x)]  # Maze
     path, path_drawn = [], False
+    distance_type = 1
 
     running = True
     while running:
@@ -188,8 +190,7 @@ def draw_maze():
                         drawn_grid[start[0]][start[1]] = 1
                     start = (rx, ry)
                     if start and end and path_drawn:
-                        path = astar.astar(copy.deepcopy(drawn_grid), start,
-                                           end)  # Dinamically generate the maze on start point update
+                        path = astar.astar(copy.deepcopy(drawn_grid), start, end, distance_type)  # Dinamically generate the maze on start point update
                 elif start != (rx, ry) and end != (rx, ry):
                     drawn_grid[rx][ry] = 0  # Set the block under the mouse as a wall
 
@@ -201,31 +202,52 @@ def draw_maze():
                         drawn_grid[end[0]][end[1]] = 1
                     end = (rx, ry)
                     if start and end and path_drawn:
-                        path = astar.astar(copy.deepcopy(drawn_grid), start,
-                                           end)  # Dinamically generate the maze on end point update
+                        path = astar.astar(copy.deepcopy(drawn_grid), start, end, distance_type)  # Dinamically generate the maze on end point update
                 elif end != (rx, ry) and start != (rx, ry):
                     drawn_grid[rx][ry] = 1  # Set the block under the mouse as empty
 
         drawGrid(drawn_grid, start, end, path)  # Draw the maze grid
 
-        draw_text('Draw Maze', font100, TEXT_COLOR, screen, WIDTH // 2, HEIGHT // 10)
-        draw_text(str(size_x), font100, TEXT_COLOR, screen, 390, 140)
-        draw_text(str(size_y), font100, TEXT_COLOR, screen, 580, 140)
-        lower_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(310, 140), (335, 115), (335, 165)])
-        higher_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(470, 140), (445, 115), (445, 165)])
-        lower_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(500, 140), (525, 115), (525, 165)])
-        higher_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(660, 140), (635, 115), (635, 165)])
+        draw_text('Draw Maze', font100, TEXT_COLOR, screen, WIDTH // 2, HEIGHT // 10 - 45)
+        draw_text(str(size_x), font100, TEXT_COLOR, screen, 390, 95)
+        draw_text(str(size_y), font100, TEXT_COLOR, screen, 580, 95)
+        lower_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(310, 95), (335, 70), (335, 120)])
+        higher_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(470, 95), (445, 70), (445, 120)])
+        lower_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(500, 95), (525, 70), (525, 120)])
+        higher_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(660, 95), (635, 70), (635, 120)])
 
         # x = (clower1[0] + 50, clower1[1]), y = (clower1[0] + 25, clower1[1] - 25), z = (clower1[0] + 25, clower1[1] + 25)  # Variable used to place shapes
         # pygame.draw.polygon(screen, RECT_COLOR, points=[x, y, z])
 
-        draw_text('Reset Maze', font32, TEXT_COLOR, screen, WIDTH // 2 + 350, HEIGHT // 10)
-        button_reset_maze = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25, 200, 50)
+        draw_text('Reset Maze', font32, TEXT_COLOR, screen, WIDTH // 2 + 350, HEIGHT // 10 - 50)
+        button_reset_maze = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25 - 50, 200, 50)
         button_reset_maze = pygame.draw.rect(screen, END_COLOR, button_reset_maze, 1)
 
-        draw_text('Solve Maze', font32, TEXT_COLOR, screen, WIDTH // 2 + 350, HEIGHT // 10 + 60)
-        button_solve_maze = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25 + 60, 200, 50)
+        draw_text('Euclidian', font20, TEXT_COLOR, screen, WIDTH // 2 + 295, HEIGHT // 10)
+        draw_text('Distance', font20, TEXT_COLOR, screen, WIDTH // 2 + 295, HEIGHT // 10 + 20)
+        button_euclidian = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25 + 60 - 50, 90, 50)
+        if distance_type == 0:
+            button_euclidian = pygame.draw.rect(screen, START_COLOR, button_euclidian, 5)
+        else:
+            button_euclidian = pygame.draw.rect(screen, GRAY_COLOR, button_euclidian, 1)
+
+        draw_text('Manhattan', font20, TEXT_COLOR, screen, WIDTH // 2 + 405, HEIGHT // 10)
+        draw_text('Distance', font20, TEXT_COLOR, screen, WIDTH // 2 + 405, HEIGHT // 10 + 20)
+        button_manhattan = pygame.Rect(WIDTH // 2 + 360, HEIGHT // 10 - 25 + 60 - 50, 90, 50)
+        if distance_type == 1:
+            button_manhattan = pygame.draw.rect(screen, START_COLOR, button_manhattan, 5)
+        else:
+            button_manhattan = pygame.draw.rect(screen, GRAY_COLOR, button_manhattan, 1)
+
+        draw_text('Solve Maze', font32, TEXT_COLOR, screen, WIDTH // 2 + 350, HEIGHT // 10 + 70)
+        button_solve_maze = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25 + 70, 200, 50)
         button_solve_maze = pygame.draw.rect(screen, START_COLOR, button_solve_maze, 1)
+
+        if path_drawn:
+            if not path:
+                draw_text('No path found', font32, END_COLOR, screen, WIDTH // 2, 140)
+            else:
+                draw_text(f'Path length is {len(path)}', font32, START_COLOR, screen, WIDTH // 2, 140)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -272,7 +294,14 @@ def draw_maze():
 
                     elif button_solve_maze.collidepoint((mx, my)):  # Check if solve button is pressed
                         if start and end:
-                            path, path_drawn = astar.astar(copy.deepcopy(drawn_grid), start, end), True  # Generate path
+                            path, path_drawn = astar.astar(copy.deepcopy(drawn_grid), start, end, distance_type), True  # Generate path
+
+                    elif button_euclidian.collidepoint((mx, my)):
+                        distance_type = 0
+                    elif button_manhattan.collidepoint((mx, my)):
+                        distance_type = 1
+
+
 
         pygame.display.update()
         CLOCK.tick(60)

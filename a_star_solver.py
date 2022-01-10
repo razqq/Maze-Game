@@ -1,3 +1,6 @@
+import math
+
+
 class Cell:
     """Class cell for A* Pathfinding"""
 
@@ -23,7 +26,7 @@ class Cell:
         return self.position == other.position
 
 
-def astar(maze, start, end):
+def astar(maze, start, end, distance_type):
     """
     This method returns a list of tuples as the path from the start to the end of the maze
     :param maze: the maze path will be searched on
@@ -52,8 +55,7 @@ def astar(maze, start, end):
     open_list.append(start_cell)
 
     # Main loop of the algorithm (stops when the player reaches the end cell)
-    while len(open_list) > 0:
-
+    while 0 < len(open_list):
         # Get the current node from the open list
         current_cell = open_list[0]
         current_index = 0
@@ -82,11 +84,10 @@ def astar(maze, start, end):
         # Generate children
         children = []
 
-        # Directions using diagonal distance
-        # directions = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-
-        # Directions using manhattan distance
-        directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+        if distance_type == 0:  # Directions using diagonal distance
+            directions = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+        else:  # Directions using manhattan distance
+            directions = [(1, 0), (0, 1), (0, -1), (-1, 0)]
         for new_position in directions:
 
             # Get the cell position
@@ -96,36 +97,41 @@ def astar(maze, start, end):
             if cell_position[0] > (len(maze) - 1) or cell_position[0] < 0 or cell_position[1] > (
                     len(maze[len(maze) - 1]) - 1) or cell_position[1] < 0:
                 continue
-
             # Check it the position is empty and is not a block
             if maze[cell_position[0]][cell_position[1]] != 1:
                 continue
 
             # Create the new cell and append it to the children list
             new_cell = Cell(current_cell, cell_position)
+            # if new_cell in closed_list:
+            #     continue
             children.append(new_cell)
 
-        # Loop trough children
+        # Loop through children
         for child in children:
-
-            # Check if child is already in the closed list
+            # Child is on the closed list
             for closed_child in closed_list:
                 if child == closed_child:
-                    continue
+                    break
+            else:
+                # Create the f, g, and h values
+                child.g = current_cell.g + 1
+                # H: Manhattan distance to end point
+                if distance_type == 0:
+                    child.h = math.sqrt((child.position[0] - end_cell.position[0]) **2 + (child.position[1] - end_cell.position[1]) ** 2)
+                else:
+                    child.h = abs(child.position[0] - end_cell.position[0]) + abs(child.position[1] - end_cell.position[1])
+                child.f = child.g + child.h
 
-            # Create the f, g and h values
-            child.g = current_cell.g + 1
-            child.h = ((child.position[0] - end_cell.position[0]) ** 2) + (
-                    (child.position[1] - end_cell.position[1]) ** 2)
-            child.f = child.g + child.h
-
-            # Check if child is already in the open list
-            for open_child in open_list:
-                if child == open_child and child.g > open_child.g:
-                    continue
-
-            # Finally, add the child to the open list
-            open_list.append(child)
+                # Child is already in the open list
+                for open_node in open_list:
+                    # check if the new path to children is worst or equal
+                    # than one already in the open_list (by measuring g)
+                    if child == open_node and child.g >= open_node.g:
+                        break
+                else:
+                    # Add the child to the open list
+                    open_list.append(child)
 
 
 if __name__ == '__main__':
