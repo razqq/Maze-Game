@@ -24,9 +24,6 @@ class Cell:
 
 
 def astar(maze, start, end):
-    for m in maze:
-        print(m)
-    print(start, end)
     """
     This method returns a list of tuples as the path from the start to the end of the maze
     :param maze: the maze path will be searched on
