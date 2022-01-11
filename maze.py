@@ -17,6 +17,20 @@ font100 = pygame.font.SysFont(None, 100)
 font32 = pygame.font.SysFont(None, 32)
 font20 = pygame.font.SysFont(None, 20)
 
+maze1_data = []
+with open('maze1.txt') as m:
+    d = m.readline()
+    while d:
+        maze1_data.append([int(c) for c in d if c.isdigit()])
+        d = m.readline()
+
+maze2_data = []
+with open('maze2.txt') as m:
+    d = m.readline()
+    while d:
+        maze2_data.append([int(c) for c in d if c.isdigit()])
+        d = m.readline()
+
 
 def draw_text(text, font, color, surface, x, y):
     text_object = font.render(text, 1, color)
@@ -211,6 +225,12 @@ def draw_maze():
         draw_text('Draw Maze', font100, TEXT_COLOR, screen, WIDTH // 2, HEIGHT // 10 - 45)
         draw_text(str(size_x), font100, TEXT_COLOR, screen, 390, 95)
         draw_text(str(size_y), font100, TEXT_COLOR, screen, 580, 95)
+        draw_text('Maze 1', font32, TEXT_COLOR, screen, 390, 155)
+        maze1_button = pygame.Rect(340, 135, 100, 40)
+        maze1_button = pygame.draw.rect(screen, PATH_COLOR2, maze1_button, 1)
+        draw_text('Maze 2', font32, TEXT_COLOR, screen, 580, 155)
+        maze2_button = pygame.Rect(530, 135, 100, 40)
+        maze2_button = pygame.draw.rect(screen, PATH_COLOR2, maze2_button, 1)
         lower_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(310, 95), (335, 70), (335, 120)])
         higher_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(470, 95), (445, 70), (445, 120)])
         lower_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(500, 95), (525, 70), (525, 120)])
@@ -245,9 +265,9 @@ def draw_maze():
 
         if path_drawn:
             if not path:
-                draw_text('No path found', font32, END_COLOR, screen, WIDTH // 2, 140)
+                draw_text('No path found', font32, END_COLOR, screen, 100, 25)
             else:
-                draw_text(f'Path length is {len(path)}', font32, START_COLOR, screen, WIDTH // 2, 140)
+                draw_text(f'Path length is {len(path)}', font32, START_COLOR, screen, 100, 25)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -300,6 +320,18 @@ def draw_maze():
                         distance_type = 0
                     elif button_manhattan.collidepoint((mx, my)):
                         distance_type = 1
+                    elif maze1_button.collidepoint((mx, my)):
+                        drawn_grid = maze1_data.copy()
+                        size_x, size_y = len(maze1_data), len(maze1_data[0])
+                        start, end = (0, 0), (39, 29)
+                        path = []
+                        path_drawn = False
+                    elif maze2_button.collidepoint((mx, my)):
+                        drawn_grid = maze2_data.copy()
+                        size_x, size_y = len(maze2_data), len(maze2_data[0])
+                        start, end = (0, 0), (21, 31)
+                        path = []
+                        path_drawn = False
 
 
 
