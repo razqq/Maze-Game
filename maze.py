@@ -151,14 +151,14 @@ def drawGrid(grid, start, end, path, h, h2):
     """
     order = {}
     global ITERATIE_ANIMATIE
-    if path:
+    if path:  # Generate order for path gradient
         for idx, x in enumerate(path):
             order[x] = idx
 
-    if path:
+    if path:  # Generate gradient for path
         diff = (PATH_COLOR2[0] - PATH_COLOR[0]) / len(path)
 
-    if h:
+    if h:  # Generate gradient for current searched cell
         if LUNGIME_ANIMATIE:
             gradient_animatie = int((HISTORY_COLOR2[0] - HISTORY_COLOR[0]) / LUNGIME_ANIMATIE * ITERATIE_ANIMATIE)
             gradient_animatie2 = int((HISTORY_COLOR2[1] - HISTORY_COLOR[1]) / LUNGIME_ANIMATIE * ITERATIE_ANIMATIE)
@@ -186,7 +186,7 @@ def drawGrid(grid, start, end, path, h, h2):
             elif h and (x, y) in h[0]:
                 pygame.draw.rect(screen, OPEN_CELL_COLOR, rect, 0)
             elif h2 and (x, y) in h2:
-                pygame.draw.rect(screen, h2[x,y], rect, 0)
+                pygame.draw.rect(screen, h2[x, y], rect, 0)
             else:
                 pygame.draw.rect(screen, RECT_COLOR, rect, grid[x][y])
     if h:
@@ -281,10 +281,7 @@ def draw_maze():
         higher_1 = pygame.draw.polygon(screen, RECT_COLOR, points=[(470, 95), (445, 70), (445, 120)])
         lower_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(500, 95), (525, 70), (525, 120)])
         higher_2 = pygame.draw.polygon(screen, RECT_COLOR, points=[(660, 95), (635, 70), (635, 120)])
-
-        # x = (clower1[0] + 50, clower1[1]), y = (clower1[0] + 25, clower1[1] - 25), z = (clower1[0] + 25, clower1[1] + 25)  # Variable used to place shapes
-        # pygame.draw.polygon(screen, RECT_COLOR, points=[x, y, z])
-
+        
         draw_text('Reset Maze', font32, TEXT_COLOR, screen, WIDTH // 2 + 350, HEIGHT // 10 - 50)
         button_reset_maze = pygame.Rect(WIDTH // 2 + 250, HEIGHT // 10 - 25 - 50, 200, 50)
         button_reset_maze = pygame.draw.rect(screen, END_COLOR, button_reset_maze, 1)
