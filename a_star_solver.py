@@ -27,6 +27,7 @@ class Cell:
 
 
 def astar(maze, start, end, distance_type):
+    history = []
     """
     This method returns a list of tuples as the path from the start to the end of the maze
     :param maze: the maze path will be searched on
@@ -79,7 +80,7 @@ def astar(maze, start, end, distance_type):
             while current is not None:
                 path.append(current.position)
                 current = current.parent
-            return path[::-1]
+            return path[::-1], history
 
         # Generate children
         children = []
@@ -132,7 +133,8 @@ def astar(maze, start, end, distance_type):
                 else:
                     # Add the child to the open list
                     open_list.append(child)
-
+        history.append([o.position for o in open_list])
+    return [], history
 
 if __name__ == '__main__':
     maze = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
